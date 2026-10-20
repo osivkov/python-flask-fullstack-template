@@ -1,0 +1,128 @@
+# Production defaults. Add compose.dev.yaml for local development.
+# Settings live in infra/.env, app/backend/.env and app/frontend/.env.
+name: ${COMPOSE_PROJECT_NAME:-flask-app}
+
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE:-webapp-frontend}:${APP_VERSION:-local}
+    build:
+      context: ../..
+      dockerfile: app/frontend/Dockerfile
+      target: production
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-/api}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks: [frontend]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp, /var/cache/nginx, /var/run]
+    security_opt: [no-new-privileges:true]
+    # Rotate Docker's stdout/stderr logs at 10 MB; retain up to 3 files.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Example budget, not a measured capacity requirement.
+    mem_limit: 128m
+
+  backend:
+    image: ${BACKEND_IMAGE:-flask-app}:${APP_VERSION:-local}
+    build:
+      context: ../../app/backend
+      target: production
+      args:
+        APP_VERSION: ${APP_VERSION:-local}
+    env_file: ../../app/backend/.env
+    environment:
+      APP_VERSION: ${APP_VERSION:-local}
+    secrets: [db_app_password]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks: [frontend, backend]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 256m
+
+  migrate:
+    image: ${BACKEND_IMAGE:-flask-app}:${APP_VERSION:-local}
+    # The migration job reuses the production application image.
+    pull_policy: never
+    env_file: ../../app/backend/.env
+    secrets: [db_app_password]
+    command: [alembic, upgrade, head]
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [backend]
+    restart: "no"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 128m
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_admin_password
+      APP_DB_NAME: ${DB_NAME:-app}
+      APP_DB_USER: ${DB_USER:-app}
+      APP_DB_PASSWORD_FILE: /run/secrets/db_app_password
+    secrets: [db_admin_password, db_app_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../postgres/create-app-db.sh:/docker-entrypoint-initdb.d/001-create-app-database.sh:ro
+    networks: [backend]
+    restart: unless-stopped
+    shm_size: 128mb
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d postgres]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
+    mem_limit: 512m
+
+networks:
+  frontend:
+  backend:
+    internal: true
+
+volumes:
+  postgres_data:
+    name: ${POSTGRES_VOLUME_NAME:-flask-app-postgres}
+    external: ${POSTGRES_VOLUME_EXTERNAL:-false}
+
+secrets:
+  db_admin_password:
+    file: ../../secrets/db_admin_password.txt
+  db_app_password:
+    file: ../../secrets/db_app_password.txt

@@ -1,0 +1,18 @@
+# Root build context is only for the frontend image and its Nginx config.
+# Whitelisting prevents env files, secrets, backups and backend code entering it.
+**
+!app/
+!app/frontend/
+!app/frontend/package.json
+!app/frontend/package-lock.json
+!app/frontend/Dockerfile
+!app/frontend/index.html
+!app/frontend/tsconfig.json
+!app/frontend/vite.config.ts
+!app/frontend/src/
+!app/frontend/src/**
+!app/frontend/public/
+!app/frontend/public/**
+!infra/
+!infra/nginx/
+!infra/nginx/default.conf

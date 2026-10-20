@@ -1,0 +1,26 @@
+# Local and production configuration
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Generated secrets and database backups
+secrets/
+backups/
+
+# Python and editor files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+.idea/
+.vscode/
+*.swp
+dist/
+node_modules/
+coverage/
+
+# Operating system files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,44 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color-scheme: light dark;
+  line-height: 1.6;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 44rem;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.5rem 1.5rem;
+}
+
+dd {
+  margin: 0;
+}
+
+button {
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: #175cd3;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+[role="alert"] {
+  color: light-dark(#b42318, #ffb4ab);
+}

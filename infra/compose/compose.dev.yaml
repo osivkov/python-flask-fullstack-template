@@ -1,0 +1,23 @@
+# Development-only changes; everything else comes from compose.yaml.
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE:-webapp-frontend}:${APP_VERSION:-local}-development
+    build:
+      target: development
+    env_file: ../../app/frontend/.env
+    # No Nginx directories are needed by the Node dev server.
+    tmpfs: !override [/tmp]
+    cap_drop: [ALL]
+    mem_limit: 512m
+    volumes:
+      - ../../app/frontend/src:/app/src:ro
+      - ../../app/frontend/public:/app/public:ro
+      - ../../app/frontend/index.html:/app/index.html:ro
+      - ../../app/frontend/vite.config.ts:/app/vite.config.ts:ro
+  backend:
+    image: ${BACKEND_IMAGE:-flask-app}:${APP_VERSION:-local}-development
+    build:
+      target: development
+    volumes:
+      - ../../app/backend/src:/app/src:ro
+      - ../../app/backend/alembic:/app/alembic
