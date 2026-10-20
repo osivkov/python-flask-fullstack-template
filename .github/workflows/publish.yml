@@ -45,7 +45,7 @@ jobs:
             type=ref,event=tag
             type=sha,prefix=sha-
       - name: Build and publish ${{ matrix.component }} image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
