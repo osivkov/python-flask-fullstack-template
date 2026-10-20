@@ -3,7 +3,7 @@ FROM mvdan/shfmt:v3.11.0 AS shfmt
 FROM rhysd/actionlint:1.7.7 AS actionlint
 FROM hadolint/hadolint:v2.12.0-alpine AS hadolint
 
-FROM node:22-alpine
+FROM node:26-alpine
 
 # Alpine maintains system tool versions; application lint tools are pinned below.
 # hadolint ignore=DL3018
