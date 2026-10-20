@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/ruff:0.14.2 AS ruff
+FROM ghcr.io/astral-sh/ruff:0.17.1 AS ruff
 FROM mvdan/shfmt:v3.11.0 AS shfmt
 FROM rhysd/actionlint:1.7.7 AS actionlint
 FROM hadolint/hadolint:v2.12.0-alpine AS hadolint
