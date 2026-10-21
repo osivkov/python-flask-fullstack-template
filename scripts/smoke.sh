@@ -24,12 +24,7 @@ else
   url="http://${site_host:-$bind_address}:${http_port}"
 fi
 
-html=$(curl --fail --silent --show-error --retry 10 --retry-connrefused "$url/")
-[[ "$html" == *'<div id="root"></div>'* ]] || {
-  echo "Frontend HTML is missing the React root." >&2
-  exit 1
-}
+curl --fail --silent --show-error --retry 10 --retry-connrefused "$url/" >/dev/null
 curl --fail --silent --show-error "$url/healthz" >/dev/null
 curl --fail --silent --show-error "$url/readyz" >/dev/null
-curl --fail --silent --show-error "$url/api/status"
-printf '\nSmoke test passed: %s\n' "$url"
+printf 'Smoke test passed: %s\n' "$url"

@@ -144,17 +144,18 @@ make format-check # check formatting without writing
 make lint         # formatting, Python/shell/Docker/CI linters + TypeScript check
 make check        # resolve and validate both Compose modes
 make test         # backend and frontend tests
-make smoke        # check frontend HTML, backend health and status through the public port
+make smoke        # check frontend HTTP and backend health through the public port
 ```
 
 Checks run in Docker. Frontend type checking and tests use its own development
 image; Python tests use the backend development image. No Node dependencies are
 added to Python and no Python dependencies are added to the frontend.
 
-Backend tests use disposable SQLite databases. CI additionally starts PostgreSQL
-and checks migrations, persistence after backend replacement, and backup/restore.
-Frontend tests cover its API client, loading failures and counter interaction.
-This is not a browser end-to-end test suite.
+Backend tests use disposable SQLite databases. CI checks formatting and types,
+validates both Compose modes, runs the application tests, starts the production
+stack and checks the public frontend and backend health endpoints. Frontend tests
+cover its API client, loading failures and counter interaction. This is not a
+browser end-to-end test suite.
 
 ## Working on the template
 
