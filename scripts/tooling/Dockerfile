@@ -1,7 +1,7 @@
 FROM ghcr.io/astral-sh/ruff:0.14.2 AS ruff
 FROM mvdan/shfmt:v3.11.0 AS shfmt
 FROM rhysd/actionlint:1.7.7 AS actionlint
-FROM hadolint/hadolint:v2.12.0-alpine AS hadolint
+FROM hadolint/hadolint:v2.15.1-alpine AS hadolint
 
 FROM node:22-alpine
 
